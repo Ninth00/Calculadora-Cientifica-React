@@ -6,24 +6,20 @@ export default function App() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
 
-  // Función para manejar las entradas
   const handleInput = (value) => {
     if (value === '.' && input.slice(-1) === '.') return;
     setInput((prev) => prev + value);
   };
 
-  // Función para calcular y validar
   const calculate = () => {
     try {
       console.log("Input actual: ", input);
 
-      // Validar división por cero
       if (input.includes('/0')) {
         alert('Error, División por cero no permitida');
         return;
       }
 
-      // Validar paréntesis
       const openParentheses = (input.match(/\(/g) || []).length;
       const closeParentheses = (input.match(/\)/g) || []).length;
 
@@ -32,10 +28,9 @@ export default function App() {
         expression += ')'.repeat(openParentheses - closeParentheses);
       }
 
-      console.log("Expresión corregida: ", expression);
-
-      // Reemplazar funciones y convertir grados a radianes
       expression = expression
+        .replace(/pi/g, 'Math.PI')
+        .replace(/e/g, 'Math.E')
         .replace(/\^/g, '**')
         .replace(/sqrt\(/g, 'Math.sqrt(')
         .replace(/log\(/g, 'Math.log10(')
@@ -43,15 +38,12 @@ export default function App() {
         .replace(/cos\((\d+(\.\d+)?)\)/g, (match, p1) => `Math.cos(${p1} * (Math.PI / 180))`)
         .replace(/tan\((\d+(\.\d+)?)\)/g, (match, p1) => `Math.tan(${p1} * (Math.PI / 180))`);
 
-      console.log("Expresión antes de evaluar: ", expression);
-
-      // Validar expresiones inválidas
       if (expression.match(/Math\.sqrt\(-\d+\)/) || expression.match(/Math\.log10\(-\d+\)/)) {
         alert('Error, Raíz cuadrada o logaritmo de número negativo no permitidos');
         return;
       }
 
-      const evaluatedResult = eval(expression); // Evaluar la expresión
+      const evaluatedResult = eval(expression);
       console.log("Resultado evaluado: ", evaluatedResult);
       setResult(evaluatedResult.toString());
 
@@ -61,10 +53,13 @@ export default function App() {
     }
   };
 
-  // Función para limpiar la entrada
   const clearInput = () => {
     setInput('');
     setResult('');
+  };
+
+  const deleteLastInput = () => {
+    setInput((prev) => prev.slice(0, -1));
   };
 
   return (
@@ -76,17 +71,34 @@ export default function App() {
         <TouchableOpacity onPress={clearInput} style={styles.button}>
           <Text style={styles.buttonText}>C</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={deleteLastInput} style={styles.button}>
+          <Text style={styles.buttonText}>DEL</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleInput('(')} style={styles.button}>
+          <Text style={styles.buttonText}>(</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleInput(')')} style={styles.button}>
+          <Text style={styles.buttonText}>)</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity onPress={() => handleInput('e')} style={styles.button}>
+          <Text style={styles.buttonText}>e</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleInput('pi')} style={styles.button}>
+          <Text style={styles.buttonText}>π</Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => handleInput('^')} style={styles.button}>
           <Text style={styles.buttonText}>^</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleInput('sqrt(')} style={styles.button}>
           <Text style={styles.buttonText}>√</Text>
         </TouchableOpacity>
+      </View>
+      <View style={styles.row}>
         <TouchableOpacity onPress={() => handleInput('log(')} style={styles.button}>
           <Text style={styles.buttonText}>log</Text>
         </TouchableOpacity>
-      </View>
-      <View style={styles.row}>
         <TouchableOpacity onPress={() => handleInput('sin(')} style={styles.button}>
           <Text style={styles.buttonText}>sin</Text>
         </TouchableOpacity>
@@ -95,9 +107,6 @@ export default function App() {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleInput('tan(')} style={styles.button}>
           <Text style={styles.buttonText}>tan</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleInput('/')} style={styles.button}>
-          <Text style={styles.buttonText}>/</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.row}>
@@ -152,6 +161,9 @@ export default function App() {
         <TouchableOpacity onPress={calculate} style={styles.button}>
           <Text style={styles.buttonText}>=</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleInput('/')} style={styles.button}>
+          <Text style={styles.buttonText}>/</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -171,7 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   result: {
-    color: '#4CAF50',
+    color: '#9c27b0', // Color morado fosforescente
     fontSize: 40,
     textAlign: 'right',
     marginBottom: 10,
@@ -191,7 +203,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   buttonText: {
-    color: 'white',
+    color: '#9c27b0', // Color morado fosforescente
     fontSize: 20,
   },
 });
